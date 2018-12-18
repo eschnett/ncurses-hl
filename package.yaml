@@ -1,0 +1,123 @@
+# This YAML file describes your package. Stack will automatically generate a
+# Cabal file when you run `stack build`. See the hpack website for help with
+# this file: <https://github.com/sol/hpack>.
+name: ncurses-hl
+version: '0.0.0.0'
+github: "eschnett/ncurses-hl"
+license:  GPL-3.0
+author: "Erik Schnetter"
+maintainer: "Erik Schnetter"
+synopsis: High-level bindings for ncurses
+description: |
+  ncurses-hl provides high-level bindings for ncurses, based on the
+  'ncurses' package.
+category: User Interfaces
+
+extra-source-files:
+  - LICENSE.md
+  - README.md
+  - package.yaml
+  - stack.yaml
+
+ghc-options:
+  - -foptimal-applicative-do
+  - -funbox-strict-fields
+  - -Wall
+  - -Wcompat
+  - -Wincomplete-record-updates
+  - -Wincomplete-uni-patterns
+  - -Wredundant-constraints
+  - -Wno-unused-matches
+
+default-extensions:
+  - ApplicativeDo
+  - BangPatterns
+  - ConstraintKinds
+  - DataKinds
+  - DefaultSignatures
+  - DeriveFoldable
+  - DeriveFunctor
+  - DeriveGeneric
+  - DeriveLift
+  - DeriveTraversable
+  - DerivingStrategies
+  - EmptyCase
+  - ExistentialQuantification
+  - FlexibleContexts
+  - FlexibleInstances
+  - FunctionalDependencies
+  - GADTs
+  - GeneralizedNewtypeDeriving
+  - InstanceSigs
+  - KindSignatures
+  - LambdaCase
+  - MultiParamTypeClasses
+  - MultiWayIf
+  - NamedFieldPuns
+  - OverloadedLists
+  - OverloadedStrings
+  - ParallelListComp
+  - PatternSynonyms
+  - RankNTypes
+  - ScopedTypeVariables
+  - StandaloneDeriving
+  - TupleSections
+  - TypeApplications
+  - TypeFamilies
+  - TypeFamilyDependencies
+  - TypeOperators
+  - TypeSynonymInstances
+  - UnicodeSyntax
+  # more controversial?
+  - AllowAmbiguousTypes
+  - MonadComprehensions
+  - PackageImports
+  - PolyKinds
+  - TypeInType
+
+library:
+  dependencies:
+    - base
+    - ncurses
+    - text
+  source-dirs: lib
+
+executables:
+  ncurses-hl:
+    source-dirs: src
+    main: Main.hs
+    dependencies:
+      - base
+      - ncurses
+      - ncurses-hl
+    ghc-options:
+      - -rtsopts
+      - -threaded
+      - -with-rtsopts=-N
+
+benchmarks:
+  ncurses-hl-benchmarks:
+    source-dirs: bench
+    main: Main.hs
+    dependencies:
+      - base
+      - criterion
+      - ncurses-hl
+    ghc-options:
+      - -rtsopts
+      - -threaded
+      - -with-rtsopts=-N
+
+tests:
+  ncurses-hl-test-suite:
+    source-dirs: test
+    main: Main.hs
+    dependencies:
+      - base
+      - tasty
+      - tasty-hspec
+      - ncurses-hl
+    ghc-options:
+      - -rtsopts
+      - -threaded
+      - -with-rtsopts=-N
