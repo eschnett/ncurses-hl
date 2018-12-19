@@ -78,6 +78,7 @@ default-extensions:
 library:
   dependencies:
     - base
+    - mtl
     - ncurses
     - text
   source-dirs: lib
