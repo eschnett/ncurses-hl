@@ -33,7 +33,7 @@ data Drawable = DrawString String
               | DrawWindow WindowShape Drawable
               | DrawPanels [(PanelShape, Drawable)]
               | DrawSome [Drawable]
-  deriving (Eq, Show)
+              | DrawWithSize (Integer -> Integer -> Drawable)
 
 -- | Border definition
 data BorderGlyphs = BorderGlyphs
@@ -99,10 +99,10 @@ draw (DrawAt y x d) =
 draw (DrawWithAttribute a b d) =
   do as0 <- stateAttributes <$> get
      withWindow (setAttribute a b)
-     modify $ \s -> let as = if b
-                          then union [a] as0
-                          else delete a as0
-                    in s { stateAttributes = as }
+     let as = if b
+              then union [a] as0
+              else delete a as0
+     modify $ \s -> s { stateAttributes = as }
      draw d
      withWindow (setAttributes as0)
      modify $ \s -> s { stateAttributes = as0 }
@@ -140,11 +140,14 @@ draw (DrawPanels ps) =
              draw d
              modify $ \s -> s { stateWindow = w0 }
 draw (DrawSome ds) = mapM_ draw ds
+draw (DrawWithSize f) =
+  do w <- stateWindow <$> get
+     (ny, nx) <- withWindow windowSize
+     draw (f ny nx)
 
 
 
 data DrawConfig = DrawConfig Drawable (Maybe Integer)
-  deriving (Eq, Show)
 
 runCursesHL :: forall s t.
                Curses (Maybe s)
@@ -159,6 +162,7 @@ runCursesHL minit rhs app2curses curses2app =
           do DrawConfig d to <- app2curses s
              w <- defaultWindow
              let c = defaultColorID
+             updateWindow w clear
              DrawState _ _ _ ws ps <-
                execStateT (draw d) (DrawState w c [] [] [])
              refreshPanels
