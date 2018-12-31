@@ -32,6 +32,7 @@ ghc-options:
 default-extensions:
   - ApplicativeDo
   - BangPatterns
+  - BinaryLiterals
   - ConstraintKinds
   - DataKinds
   - DefaultSignatures
@@ -88,7 +89,10 @@ executables:
     source-dirs: src
     main: Main.hs
     dependencies:
+      - array
       - base
+      - base64-string
+      - monad-loops
       - ncurses
       - ncurses-hl
     ghc-options:

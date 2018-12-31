@@ -34,6 +34,7 @@ data Drawable = DrawString String
               | DrawPanels [(PanelShape, Drawable)]
               | DrawSome [Drawable]
               | DrawWithSize (Integer -> Integer -> Drawable)
+              -- | DrawIO (IO ())
 
 -- | Border definition
 data BorderGlyphs = BorderGlyphs
@@ -144,10 +145,12 @@ draw (DrawWithSize f) =
   do w <- stateWindow <$> get
      (ny, nx) <- withWindow windowSize
      draw (f ny nx)
+-- draw (DrawIO io) =
+--   lift (liftIO io)
 
 
 
-data DrawConfig = DrawConfig Drawable (Maybe Integer)
+data DrawConfig = DrawConfig Drawable (IO ()) (Maybe Integer)
 
 runCursesHL :: forall s t.
                Curses (Maybe s)
@@ -159,7 +162,7 @@ runCursesHL minit rhs app2curses curses2app =
   runCurses (iterateWhileJustM_ step minit)
   where step :: s -> Curses (Maybe s)
         step s =
-          do DrawConfig d to <- app2curses s
+          do DrawConfig d io to <- app2curses s
              w <- defaultWindow
              let c = defaultColorID
              updateWindow w clear
@@ -169,6 +172,7 @@ runCursesHL minit rhs app2curses curses2app =
              render
              mapM_ deletePanel ps
              mapM_ closeWindow ws
+             liftIO io
              ev <- getEvent w to
              t <- curses2app ev
              rhs t s
@@ -178,11 +182,8 @@ runCursesHL minit rhs app2curses curses2app =
 -- | Iterate while the state is 'Just a'
 iterateWhileJustM_ :: forall m a. Monad m
                    => (a -> m (Maybe a)) -> m (Maybe a) -> m ()
-iterateWhileJustM_ upd mst0 =
-  loop =<< mst0
+iterateWhileJustM_ upd ini =
+  ini >>= loop
   where loop :: Maybe a -> m ()
-        loop mst =
-          do case mst of
-               Nothing -> return ()
-               Just st -> do mst' <- upd st
-                             loop mst'
+        loop Nothing = return ()
+        loop (Just st) = upd st >>= loop
