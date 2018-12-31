@@ -34,7 +34,6 @@ data Drawable = DrawString String
               | DrawPanels [(PanelShape, Drawable)]
               | DrawSome [Drawable]
               | DrawWithSize (Integer -> Integer -> Drawable)
-              -- | DrawIO (IO ())
 
 -- | Border definition
 data BorderGlyphs = BorderGlyphs
@@ -145,8 +144,6 @@ draw (DrawWithSize f) =
   do w <- stateWindow <$> get
      (ny, nx) <- withWindow windowSize
      draw (f ny nx)
--- draw (DrawIO io) =
---   lift (liftIO io)
 
 
 

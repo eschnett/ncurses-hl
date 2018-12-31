@@ -2,17 +2,17 @@ version: 2
 jobs:
   build:
     docker:
-      - image: fpco/stack-build:lts-12.24
+      - image: fpco/stack-build:lts-12.26
     working_directory: /home/stackage
     steps:
       - checkout
       - restore_cache:
-          key: cache-lts-12.24
+          key: cache-lts-12.26
       - run: sudo apt update
       - run: sudo apt -y install libncurses5-dev libncursesw5-dev
       - run: stack --no-terminal --system-ghc build --haddock --test --only-dependencies
       - save_cache:
-          key: cache-lts-12.24
+          key: cache-lts-12.26
           paths:
             - ~/.stack
       - run: stack --no-terminal --system-ghc install --haddock --test
